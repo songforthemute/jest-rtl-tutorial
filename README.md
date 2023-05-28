@@ -11,6 +11,8 @@
 -   [테스트 유형](#테스트-유형)
 -   [유닛 테스트 vs 기능 테스트](#유닛-테스트-vs-기능-테스트)
 -   [가상 DOM 요소 탐색 우선순위](#가상-dom-요소-탐색-우선순위)
+-   [`logRoles`](#logroles)
+-   [`user-event` vs `fireEvent`](#user-event-vs-fireevent)
 
 ---
 
@@ -357,6 +359,8 @@ npx create-react-app . --template typescript
 
 ## 가상 DOM 요소 탐색 우선순위
 
+#### **References**
+
 -   [About Queries - Priority | Testing Library](https://testing-library.com/docs/queries/about/#priority)
 -   [jest-dom | Testing Library](https://github.com/testing-library/jest-dom)
 
@@ -409,3 +413,60 @@ npx create-react-app . --template typescript
     export default App;
 
 </details>
+
+---
+
+## logRoles
+
+-   DOM 트리의 모든 암시적 `aria-roles`의 리스트를 출력할 때 쓰는 헬퍼 함수.
+-   각 role에는 해당 ARIA role과 일치하는 모든 노드의 목록이 포함됨.
+-   `getByRole`을 사용해 테스트하는 DOM에 쿼리를 보내는 방법을 찾을 때 유용.
+-   페이지가 길어서 역할이 있는 항목들이 헷갈릴 경우에 유용.
+-   [Debugging | Testing Library](https://testing-library.com/docs/dom-testing-library/api-debugging/#logroles)
+
+<details>
+<summary><i>Example</i></summary>
+
+    // App.test.tsx
+    import { render, screen } from "@testing-library/react";
+    import App from "./App";
+    import { logRoles } from "@testing-library/dom";
+
+    test("getRoles", function () {
+        const { container } = render(<App />);
+        logRoles(container);
+    });
+
+    // shell
+      console.log
+          button:
+
+          Name "Change to blue":
+          <button
+            style="background-color: red;"
+          />
+
+          --------------------------------------------------
+
+</details>
+
+---
+
+## `user-event` vs `fireEvent`
+
+#### **`user-event`**
+
+-   상호 작용이 브라우저에서 발생할 경우, 발생할 이벤트를 발송해 사용자 상호 작용을 시뮬레이션하는, 테스트 라이브러리에 동반되는 라이브러리.
+
+#### **Diff**
+
+-   `fireEvent`는 단순 DOM 이벤트를 디스패치하는 반면, `user-event`는 전체 상호 작용을 시뮬레이션하여 여러 이벤트를 발생시키고, 도중에 추가 검사도 수행 가능.
+-   테스팅 라이브러리에 내장된 `fireEvent`는 브라우저의 로우 레벨 dispatchEvent API—개발자가 어떤 엘리먼트에서 어떤 이벤트를 트리거할 수 있게 해주는—를 감싸는 가벼운 래퍼.
+-   문제는 브라우저는 보통 하나의 상호 작용에 대해 하나의 이벤트를 트리거하는 것 이상으로 수행한다는 것—이를테면, 사용자가 텍스트 박스에 타이핑 시 엘리먼트가 포커스되어, 키보드 이벤트와 입력 이벤트가 발동되고 엘리먼트의 선택과 값이 조작됨.
+-   `user-event`를 사용하면 구체적인 이벤트 대신, 사용자 인터랙션으로 기술 가능. 이는 브라우저에서 사용자 인터랙션이 일어나는 것처럼, 가시성과 상호작용성 검사를 추가하고 DOM을 조작—이를테면, 브라우저가 사용자에게 숨겨진 요소를 클릭하거나 비활성화된 텍스트 박스에 입력할 수 없도록.
+-   하지만, ‘아직 실행되지 않은 사용자 인터랙션’ 같은 측면으로 인해 설명할 수 없는 측면이 있고, 이러한 경우 `fireEvent`를 이용하여 소프트웨어가 의존하는 구체적 이벤트를 디스패치할 수 있음.
+
+#### **References**
+
+-   [User Interactions | Testing Library](https://testing-library.com/docs/user-event/intro/)
+-   [Why you should test with user-event](https://ph-fritsche.github.io/blog/post/why-userevent)
