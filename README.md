@@ -1,4 +1,4 @@
-# Learn 'React Testing Library with Jest'
+# Learn 'React Testing Library with Jest (pre)'
 
 ## 목차
 
@@ -10,6 +10,7 @@
 -   [TDD](#tddtest-driven-development)
 -   [테스트 유형](#테스트-유형)
 -   [유닛 테스트 vs 기능 테스트](#유닛-테스트-vs-기능-테스트)
+-   [가상 DOM 요소 탐색 우선순위](#가상-dom-요소-탐색-우선순위)
 
 ---
 
@@ -223,7 +224,7 @@ npx create-react-app . --template typescript
 
 ## Differences between RTL & Jest
 
--   **React Testing Library(RTL)**
+#### **React Testing Library(RTL)**
 
     -   컴포넌트의 가상 DOM 렌더링 보조 - 테스트를 위한 가상 DOM 생성.
     -   가상 DOM 탐색 보조 - 브라우저 없이 테스트를 가능케 함.
@@ -291,6 +292,11 @@ npx create-react-app . --template typescript
 -   그래서 개발하며 모든 테스트를 작성해두면, 변경 사항이 생길 때마다 모든 테스트를 재실행해 자동 회귀 테스트 가능.
 -   변경 사항 확인을 위해 애플리케이션을 열어 수동으로 테스트할 필요가 없음.
 
+#### **TDD vs BDD(Behavior-Driven Development)**
+
+-   테스팅 라이브러리는 사용자의 애플리케이션 사용 방식 테스트를 권장 - 행동 테스트.
+-   BDD(행동 주도 개발)는 매우 명확하게 정의되어 있음 - 개발자, QA, 사업 파트너 등 다양한 역할 간의 협업이 필요하며, 서로 다른 그룹이 상호 작용하는 방식에 관한 프로세스도 정의되어 있음.
+
 ---
 
 ## 테스트 유형
@@ -311,7 +317,7 @@ npx create-react-app . --template typescript
 -   즉, 코드가 아닌 동작 자체를 테스트.
 -   RTL은 기능 테스트를 권장.
 
-#### \*\*인수(Acceptance) 테스트 / 엔드 투 엔드(E2E, End-to-End) 테스트
+#### **인수(Acceptance) 테스트 / 엔드 투 엔드(E2E, End-to-End) 테스트**
 
 -   실제 브라우저와 애플리케이션이 연결된 서버가 필요.
 -   보통 `Cypress`, `Selenium` 등의 특별한 도구 사용.
@@ -346,3 +352,60 @@ npx create-react-app . --template typescript
 -   유닛 테스트와는 달리, 코드 작성 방식을 리팩토링하면 동작이 동일하게 유지되는 한 테스트도 통과하게 됨.
 -   **하지만, 실패한 테스트를 디버깅하기 어려운 단점이 존재.**
     -   유닛 테스트처럼 코드가 테스트와 밀접하게 연결되어 있지 않아, 정확히 어떤 부분의 코드가 테스트 실패의 원인인지 정확히 알기 어려움.
+
+---
+
+## 가상 DOM 요소 탐색 우선순위
+
+-   [About Queries - Priority | Testing Library](https://testing-library.com/docs/queries/about/#priority)
+-   [jest-dom | Testing Library](https://github.com/testing-library/jest-dom)
+
+#### **1. 누구나 액세스 가능한 쿼리(Queries Accessible to Everyone)**
+
+-   마우스를 사용하고 있고, 화면을 시각적으로 보고 있으며, 보조 기술을 사용하는 사람이면 사용 가능한 쿼리.
+-   `getByRole` 접근성 트리에서 노출된 모든 요소에 질의할 때 사용. `name` 옵션을 사용하며, Accesible name(_ex. `aria-label`_)을 기준으로 반환된 요소를 필터링할 수 있음 - 즉, 페이지에서 요소 역할을 식별.
+-   `getByLabelText` form 필드에 적합한 메서드. 웹사이트 폼을 탐색할 때, label 텍스트를 사용해 요소를 탐색 - 스크린 리더가 액세스 가능.
+-   `getByPlaceholderText` input 요소에 액세스. label을 대체하는 것은 아니지만 그것이 전부라면 다른 대안보다 나을 수 있음.
+-   `getByText` form 바깥의 텍스트 컨텐츠 - 사용자가 요소를 찾는 주된 방법. 대화형이 아닌 디스플레이 요소에 사용.
+-   `getByDisplayValue` form 요소의 현재 값 - 현재 값이 채워진 페이지를 탐색할 때 유용함.
+
+#### **2. 시맨틱(Semantic) 쿼리**
+
+-   누구나 액세스 가능한 쿼리 중, 어느 것도 사용할 수 없는 경우 사용.
+-   `getByAllText` alt 속성을 지원하는 요소인 경우, 이를 사용해 해당 요소를 탐색 - img, area, input, 커스텀 요소 등.
+-   `getByTitle` title 요소 탐색 - 스크린 리더에게 일관되게 읽히지 않으며, 일반 사용자들에게 표시되지 않음.
+
+#### **3. Test IDs**
+
+-   `getByTestId` 사용자는 이러한 메시지를 보거나 들을 수 없고, 스크린 리더도 액세스할 수 없어서 역할 또는 텍스트 별로 매치될 수 없거나 의미가 없는 텍스트(_ex. 동적인 텍스트_)에만 이 옵션을 사용하는 것을 권장.
+    -   _cf. data-testId 속성을 사용하는 것은 소프트웨어 사용 방식과 유사하지 않으므로, 가능하면 피하는 것을 권장 - 하지만, DOM 구조나 CSS 클래스 이름을 기반으로 쿼리하는 것보다 나음._
+
+<details>
+<summary><i>Example</i></summary>
+
+    // App.test.tsx
+    import { render, screen } from "@testing-library/react";
+    import App from "./App";
+
+    test("button has correct initial color", function () {
+      render(<App />);
+
+      // find an element with a role of button and text of 'Change to blue'
+      const colorButton = screen.getByRole("button", { name: "Change to blue" });
+
+      // assertion: expect the background color to be red
+      expect(colorButton).toHaveStyle({ backgroundColor: "red" });
+    });
+
+    // App.tsx
+    function App() {
+      return (
+        <div className="App">
+          <button style={{ backgroundColor: "red" }}>Change to blue</button>
+        </div>
+      );
+    }
+
+    export default App;
+
+</details>
