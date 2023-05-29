@@ -3,7 +3,7 @@
 ## 목차
 
 -   [React Testing Library?](#react-testing-library)
--   [Tutorial](#tutorial)
+-   [톺아보기](#톺아보기)
 -   [`App.test.tsx` 워크플로](#apptesttsx-워크플로)
 -   [jest-dom](#jest-dom)
 -   [Differences between RTL & Jest](#differences-between-rtl--jest)
@@ -35,7 +35,7 @@
 
 ---
 
-## Tutorial
+## 톺아보기
 
 #### **_Init CRA_**
 
@@ -554,6 +554,20 @@ npx create-react-app . --template typescript
         "editor.codeActionsOnSave": {
             "source.fixAll.eslint": true
         }
+    }
+    ```
+
+#### **VS code에서 저장 시 Prettier가 자동 적용되도록 구성하기**
+
+-   `prettier` 익스텐션 필요.
+-   프로젝트 루트 디렉터리에 `.vscode/settings.json` 파일에 아래의 옵션 추가.
+
+    ```json
+    // .vscode/settings.json
+
+    {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
     }
     ```
 
