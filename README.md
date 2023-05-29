@@ -13,6 +13,8 @@
 -   [가상 DOM 요소 탐색 우선순위](#가상-dom-요소-탐색-우선순위)
 -   [`logRoles`](#logroles)
 -   [`user-event` vs `fireEvent`](#user-event-vs-fireevent)
+-   [유닛(Unit) 테스팅](#유닛unit-테스팅)
+-   [Jest & RTL을 위한 ESLint 구성](#jest--rtl을-위한-eslint-구성)
 
 ---
 
@@ -458,6 +460,11 @@ npx create-react-app . --template typescript
 
 -   상호 작용이 브라우저에서 발생할 경우, 발생할 이벤트를 발송해 사용자 상호 작용을 시뮬레이션하는, 테스트 라이브러리에 동반되는 라이브러리.
 
+#### **`fireEvent`**
+
+-   React의 테스트 라이브러리에서 가져온 객체로서, click과 같은 메서드를 포함.
+-   버튼의 활성화를 위한 `toBeEnabled`, 버튼의 비활성화를 위한 `toBeDisabled`, 체크박스를 위한 `toBeChecked` 등.
+
 #### **Diff**
 
 -   `fireEvent`는 단순 DOM 이벤트를 디스패치하는 반면, `user-event`는 전체 상호 작용을 시뮬레이션하여 여러 이벤트를 발생시키고, 도중에 추가 검사도 수행 가능.
@@ -470,3 +477,91 @@ npx create-react-app . --template typescript
 
 -   [User Interactions | Testing Library](https://testing-library.com/docs/user-event/intro/)
 -   [Why you should test with user-event](https://ph-fritsche.github.io/blog/post/why-userevent)
+
+---
+
+## 유닛(Unit) 테스팅
+
+#### **유닛(Unit) 테스팅 함수**
+
+-   함수의 유닛 테스트를 권장하는 경우
+    -   기능 테스트로 테스트하기엔 로직이 너무 복잡한 경우.
+    -   가령 엣지 케이스가 너무 많아서 기능 테스트로 테스트하기가 현실적으로 맞지 않는 경우가 존재 - 컴포넌트를 활성화시켜서 가능한 모든 엣지 케이스에 대해 기능 테스트를 수행하는 것이 과할 수 있음.
+-   `describe()` jest에서 제공하는 전역 메서드로, 테스트를 그룹으로 묶는 방법.
+
+    ```tsx
+    // check whether the function is work well
+    describe("Spaces before camel-case capital letters", () => {
+        test("Works for no inner capital letters", () => {
+            expect(replaceCamelWithSpaces("Red")).toBe("Red");
+        });
+
+        test("Works for one inner capital letters", () => {
+            expect(replaceCamelWithSpaces("MidnightBlue")).toBe(
+                "Midnight Blue"
+            );
+        });
+
+        test("Works for multiple capital letters", () => {
+            expect(replaceCamelWithSpaces("MediumVioletRed")).toBe(
+                "Medium Violet Red"
+            );
+        });
+    });
+    ```
+
+#### **유닛 테스팅이 유용한 경우**
+
+-   복잡한 함수의 경우, 유닛 테스트를 통해 모든 가능한 엣지 케이스를 확인 가능 - 엣지 케이스 전부를 테스트하기 위해 컴포넌트를 활성화시킬 필요가 없음.
+-   기능 테스트의 실패 원인을 판단하려는 경우 - 실패 원인은 기능 내의 광범위한 부분에 해당할 수 있는데 이를 유닛 테스트를 시도하고 실패할 시 해당 요소로 인해 테스트가 실패했다는 점을 알 수 있음.
+
+---
+
+## Jest & RTL을 위한 ESLint 구성
+
+#### **ESLint 구성 설정**
+
+-   `npm install eslint-plugin-jest-dom`
+-   `npm install eslint-plugin-testing-library`
+
+-   VS code의 ESLint 익스텐션 필요.
+-   `package.json` 파일의 `eslintConfig` 속성을 제거하고, 개별 구성을 위해 프로젝트 루트 디렉터리에 `.eslintrc.json` 파일 생성.
+
+    ```json
+    // .eslintrc.json
+
+    {
+        "plugins": ["testing-library", "jest-dom"],
+        "extends": [
+            "react-app",
+            "react-app/jest",
+            "plugin:testing-library/react",
+            "plugin:jest-dom/recommended"
+        ]
+    }
+    ```
+
+#### **VS code의 ESLint를 따르는 자동 수정 설정**
+
+-   프로젝트 루트 디렉터리에 `.vscode` 폴더와 해당 폴더 내에 `settings.json` 파일 생성.
+-   `source` 파일에 있는 모든 ESLint 문제를 수정하도록 설정.
+-   `.gitignore`에 `.vscode`와 `.eslintcache`를 추가하는 것을 권장.
+
+    ```json
+    // .vscode/settings.json
+
+    {
+        "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": true
+        }
+    }
+    ```
+
+#### **References**
+
+-   [eslint-plugin-testing-library](https://github.com/testing-library/eslint-plugin-testing-library)
+-   [eslint-plugin-jest-dom](https://github.com/testing-library/eslint-plugin-jest-dom)
+
+---
+
+##

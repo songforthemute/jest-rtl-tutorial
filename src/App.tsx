@@ -1,10 +1,20 @@
 import { useState } from "react";
 
+export function replaceCamelWithSpaces(colorName: string) {
+    // Red => Red
+    // MidnightBlue => Midnight Blue
+    // MediumVioletRed => Medium Violet Red
+    return colorName.replace(/\B([A-Z])\B/g, " $1");
+}
+
 function App() {
-    const [color, setColor] = useState("red");
+    const [color, setColor] = useState("MidnightBlue");
     const [checkDisable, setCheckDisable] = useState(false);
 
-    const txt = color === "red" ? "blue" : "red";
+    const txt =
+        color === "MidnightBlue"
+            ? replaceCamelWithSpaces("MediumVioletRed")
+            : replaceCamelWithSpaces("MidnightBlue");
 
     return (
         <div className="App">
@@ -12,7 +22,11 @@ function App() {
                 disabled={checkDisable}
                 style={{ backgroundColor: color }}
                 onClick={() => {
-                    setColor((v) => (v === "red" ? "blue" : "red"));
+                    setColor((v) =>
+                        v === "MidnightBlue"
+                            ? "MediumVioletRed"
+                            : "MidnightBlue"
+                    );
                 }}
             >
                 Change to {txt}
