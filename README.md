@@ -15,6 +15,7 @@
 -   [`user-event` vs `fireEvent`](#user-event-vs-fireevent)
 -   [유닛(Unit) 테스팅](#유닛unit-테스팅)
 -   [Jest & RTL을 위한 ESLint 구성](#jest--rtl을-위한-eslint-구성)
+-   [Mock Service Worker](#mock-service-worker)
 
 ---
 
@@ -200,7 +201,7 @@ npx create-react-app . --template typescript
 -   CRA에 제공되어 패키지 설치 시 함께 설치됨.
 -   `setupTests.js` 파일을 사용해 각각의 테스트 이전에 jest-dom을 가져옴.
 
-    -   즉, 모든 테스트에서 jest-dom Matcher를 사용 가능.
+    -   즉, 모든 테스트에서 jest-dom Matcher를 사용 가능하게 하며, 단언(Assertion)이 가능하게 함.
 
     -   <details>
             <summary>
@@ -635,4 +636,66 @@ command[All]ByQueryType
 
 ---
 
-##
+## Mock Service Worker
+
+#### **Why**
+
+-   네트워크 호출을 가로채어 지정된 응답의 반환 필요.
+-   테스트 도중 네트워크 호출 방지.
+-   서버 응답에 기반한 테스트 조건 설정.
+
+#### **How to**
+
+-   `handler` 생성 - 특정 URL과 Route에 무엇을 반환할지 결정하는 함수.
+-   요청을 처리할 테스트 서버 생성 및 테스트 도중 테스트 서버가 수신 대기 중인지, 인터넷으로 나가는 호출을 가로채고 있는지 확인.
+-   각 테스트 이후, 다음 테스트를 위한 서버 핸들러 재설정.
+
+```shell
+npm install msw
+```
+
+```typescript
+// src/mocks/handlers.ts
+import { rest } from "msw";
+
+export const handlers = [
+    rest.get("http://localhost:3030/scoops", (req, res, ctx) => {
+        return res(
+            ctx.json([
+                { name: "Chocolate", imagePath: "/images/chocolate.png" },
+                { name: "Vanilla", imagePath: "/images/vanilla.png" },
+            ])
+        );
+    }),
+];
+
+// src/mocks/server.ts
+import { setupServer } from "msw/node";
+import { handlers } from "./handlers";
+
+export const server = setupServer(...handlers);
+
+// src/setupTests.ts
+import { server } from "./mocks/server";
+
+// Establish API mocking before all tests.
+beforeAll(() => server.listen());
+
+// Reset any request handlers that we may add during the tests,
+// so they don't affect other tests.
+afterEach(() => server.resetHandlers());
+
+// Clean up after the tesets are finished.
+afterAll(() => server.close());
+```
+
+#### **Compare between MSW and Axios**
+
+-   MSW는 요청을 만드는 데 사용된 라이브러리에 관계없이 모든 HTTP 요청을 모킹하는 데 사용할 수 있는 반면, Axios는 Axios를 사용해 만들어진 요청을 모킹하는 데만 사용 가능.
+-   MSW를 사용하면 실제로 서비스 워커에 가로채서 모킹, 즉 API 서버에 실제 요청을 할 때와 같은 방식으로 작동하는 반면, Axios는 단순히 Axios 라이브러리를 모킹 구현으로 대체하므로 실제 요청과 정확하게 동일한 방식으로 동작하지 않을 수 있음.
+-   MSW는 `msw` 패키지를 설치하여 바로 사용할 수 있지만, Axios는 `AxiosMockAdapter` 패키지가 추가로 필요.
+
+#### **References**
+
+-   [Introduce | Mock Service Worker](https://mswjs.io/docs)
+-   [Response resolver | Mock Service Worker](https://mswjs.io/docs/basics/response-resolver)
