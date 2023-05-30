@@ -361,10 +361,22 @@ npx create-react-app . --template typescript
 
 ## 가상 DOM 요소 탐색 우선순위
 
+#### **Screen Query Methods**
+
+```jsx
+command[All]ByQueryType
+```
+
+-   `get` 요소가 DOM 내에 있을 것으로 예상. _ex. getAllByRole_
+-   `query` 요소가 DOM 내에 있지 않을 것으로 예상. _ex. queryByLabelText()_
+-   `find` 요소가 비동기적으로 나타날 것으로 예상. _ex. findByText()_
+
 #### **References**
 
 -   [About Queries - Priority | Testing Library](https://testing-library.com/docs/queries/about/#priority)
 -   [jest-dom | Testing Library](https://github.com/testing-library/jest-dom)
+-   [Cheatsheet(React) | Testing Library](https://testing-library.com/docs/react-testing-library/cheatsheet/)
+-   [Which query should I use? | Testing Library](https://testing-library.com/docs/queries/about#priority)
 
 #### **1. 누구나 액세스 가능한 쿼리(Queries Accessible to Everyone)**
 
@@ -458,12 +470,57 @@ npx create-react-app . --template typescript
 
 #### **`user-event`**
 
--   상호 작용이 브라우저에서 발생할 경우, 발생할 이벤트를 발송해 사용자 상호 작용을 시뮬레이션하는, 테스트 라이브러리에 동반되는 라이브러리.
+-   상호 작용이 브라우저에서 발생할 경우, 발생할 이벤트를 발송해 **사용자 상호 작용을 시뮬레이션**하는, 테스트 라이브러리에 동반되는 라이브러리.
+
+    ```tsx
+    /* 
+      @testing-library/user-event@^14
+      @testing-library/react@^14
+      @testing-library/dom@^9
+    
+      user-event 14.0.0 - APIs always return a Promise.
+      await 처리가 없으면 단언(Assertion)이 이벤트 완료를 기다리지 못함.
+    */
+
+    test("Fired onClick", async () => {
+        // import userEvent from "@testing-library/user-event";
+        const user = userEvent.setup();
+
+        // render DOM
+        render(<SummaryForm />);
+
+        // get Elements
+        const checkbox = screen.getByRole("checkbox");
+
+        // fire click event
+        await user.click(checkbox);
+
+        // state after click
+        expect(checkbox).toBeChecked();
+    });
+    ```
 
 #### **`fireEvent`**
 
+-   **DOM Event**를 디스패치 - 컴퓨터 이벤트를 시뮬레이션하기에 사용자 이벤트와 거리가 있을 수 있음.
 -   React의 테스트 라이브러리에서 가져온 객체로서, click과 같은 메서드를 포함.
 -   버튼의 활성화를 위한 `toBeEnabled`, 버튼의 비활성화를 위한 `toBeDisabled`, 체크박스를 위한 `toBeChecked` 등.
+
+    ```tsx
+    test("initial conditions", function () {
+        render(<App />);
+
+        // check that the button starts out enabled
+        const colorButton = screen.getByRole("button", {
+            name: "Change to Medium Violet Red",
+        });
+        expect(colorButton).toBeEnabled();
+
+        // check that the checkbox starts out unchecked
+        const checkbox = screen.getByRole("checkbox");
+        expect(checkbox).not.toBeChecked();
+    });
+    ```
 
 #### **Diff**
 
