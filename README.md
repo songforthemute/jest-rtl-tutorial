@@ -1,5 +1,9 @@
 # Learn 'React Testing Library with Jest (pre)'
 
+_<small>Learned this from the lecture of Bonnie Schulkin TY :D</small>_
+
+---
+
 ## 목차
 
 -   [React Testing Library?](#react-testing-library)
@@ -16,6 +20,7 @@
 -   [유닛(Unit) 테스팅](#유닛unit-테스팅)
 -   [Jest & RTL을 위한 ESLint 구성](#jest--rtl을-위한-eslint-구성)
 -   [Mock Service Worker](#mock-service-worker)
+-   [With Context](#with-context)
 
 ---
 
@@ -702,3 +707,47 @@ afterAll(() => server.close());
 
 -   [Introduce | Mock Service Worker](https://mswjs.io/docs)
 -   [Response resolver | Mock Service Worker](https://mswjs.io/docs/basics/response-resolver)
+
+---
+
+## With Context
+
+#### **개별적 Wrapper 적용**
+
+-   `render` 함수에서 두 번째 인자 객체의 `wrapper` 속성에 wrapper로 사용할 Context Provider 할당.
+
+```tsx
+test("Update scoop subtotal when scoops change", async () => {
+    const user = userEvent.setup();
+
+    render(<Options optionType="scoops" />, { wrapper: OrderDetailsProvider });
+
+    /* ... */
+});
+```
+
+#### **전역적 Wrapper 적용**
+
+-   Wrapper를 포함하는 Custom Render를 정의해서 사용.
+
+```tsx
+import { RenderOptions, render } from "@testing-library/react";
+import { OrderDetailsProvider } from "../contexts/OrderDetails";
+
+// define custom render function
+const renderWithContext = (ui: JSX.Element, options?: RenderOptions) => {
+    return render(ui, { wrapper: OrderDetailsProvider, ...options });
+};
+
+// re-export everything
+export * from "@testing-library/react";
+
+// override render method
+export { renderWithContext as render };
+```
+
+#### **References**
+
+-   [Custom Render (React) | Testing Library](https://testing-library.com/docs/react-testing-library/setup/#custom-render)
+
+---
