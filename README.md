@@ -17,7 +17,7 @@ _<small>Learned this from the lecture of Bonnie Schulkin TY :D</small>_
 -   [가상 DOM 요소 탐색 우선순위](#가상-dom-요소-탐색-우선순위)
 -   [`logRoles`와 `screen.debug`](#logroles와-screendebug)
 -   [`user-event` vs `fireEvent`](#user-event-vs-fireevent)
--   [`jest.fn()`](<#jest.fn()>)
+-   [`jest.fn()`](#jestfn)
 -   [유닛(Unit) 테스팅](#유닛unit-테스팅)
 -   [Jest & RTL을 위한 ESLint 구성](#jest--rtl을-위한-eslint-구성)
 -   [Mock Service Worker](#mock-service-worker)
