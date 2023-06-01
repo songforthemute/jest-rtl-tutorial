@@ -21,6 +21,7 @@ _<small>Learned this from the lecture of Bonnie Schulkin TY :D</small>_
 -   [Jest & RTL을 위한 ESLint 구성](#jest--rtl을-위한-eslint-구성)
 -   [Mock Service Worker](#mock-service-worker)
 -   [With Context](#with-context)
+-   [Error logs](#error-logs)
 
 ---
 
@@ -749,5 +750,56 @@ export { renderWithContext as render };
 #### **References**
 
 -   [Custom Render (React) | Testing Library](https://testing-library.com/docs/react-testing-library/setup/#custom-render)
+
+---
+
+## Error Logs
+
+#### **`describe`문 내 테스트 공통 요소 취득 및 렌더링**
+
+```tsx
+describe("Grand total", () => {
+    const user = userEvent.setup();
+    render(<OrderEntry />);
+    const grandTotal = screen.getByRole("heading", {
+        name: /grand total: \$/i,
+    });
+
+    test("grand total starts at $0.00", () => {
+        expect(grandTotal).toHaveTextContent("0.00");
+    });
+
+    test("grand total updates properly if scoop is added first", async () => {
+        const chocolateInput = await screen.findByRole("spinbutton", {
+            name: "Chocolate",
+        });
+        /* ... */
+    }
+});
+```
+
+-   describe문으로 test suite를 묶어 테스트를 진행하며 발생.
+-   공통된 부분을 함께 쓰기 위해, 공통된 요소 취득과 렌더링 부분을 각 테스트마다 기술하지 않고 상단에 기술하였더니 요소를 탐색하지 못했음.
+-   **솔루션**
+    -   각 테스트 내부에 요소 취득 부분과 렌더링 부분을 각각 기술하여 해결.
+
+#### **Unmount timing lead to "test was not wrapped in act"**
+
+-   Testing Library에서 테스트 클린업의 일부로 컴포넌트를 언마운트 한다면, 네트워크 요청을 중단하는 useEffect 반환 함수는 Testing Library의 자동 언마운트에서 명시적 언마운트처럼 동작해야 하는데, `Test was not wrapped in act` 에러 발생. (원래 자동 언마운트는 useEffect 반환 함수를 트리거하고 오류가 발생하지 않아야 함.)
+-   [Github Issue | react-testing-library](https://github.com/testing-library/react-testing-library/issues/999)
+-   **솔루션**
+
+    1. 네트워크 요청을 하는 React 컴포넌트의 useEffect 훅 내부에 `new AbortCountroller()` 컨트롤러 자바스크립트 객체 생성.
+    2. `fetch` 함수 혹은 `Axios`를 통한 네트워크 요청의 `RequestInit` 객체 내부 `signal` 속성에 컨트롤러의 `signal` 프로퍼티 할당.
+    3. `useEffect` 훅의 반환값으로 `() => { abortController.abort(); }` 함수 반환.
+    4. 테스트 케이스 내부에 렌더링하는 부분에서 `unmount` 함수를 구조분해해서 취득하고, 테스트가 끝난 후 명시적으로 언마운트.
+
+        ```tsx
+        test("e.g.", () => {
+            const { unmount } = render(<OrderEntry />);
+            /* test codes ... */
+            unmount();
+        });
+        ```
 
 ---
