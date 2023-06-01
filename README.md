@@ -15,8 +15,9 @@ _<small>Learned this from the lecture of Bonnie Schulkin TY :D</small>_
 -   [테스트 유형](#테스트-유형)
 -   [유닛 테스트 vs 기능 테스트](#유닛-테스트-vs-기능-테스트)
 -   [가상 DOM 요소 탐색 우선순위](#가상-dom-요소-탐색-우선순위)
--   [`logRoles`](#logroles)
+-   [`logRoles`와 `screen.debug`](#logroles와-screendebug)
 -   [`user-event` vs `fireEvent`](#user-event-vs-fireevent)
+-   [`jest.fn()`](<#jest.fn()>)
 -   [유닛(Unit) 테스팅](#유닛unit-테스팅)
 -   [Jest & RTL을 위한 ESLint 구성](#jest--rtl을-위한-eslint-구성)
 -   [Mock Service Worker](#mock-service-worker)
@@ -440,7 +441,9 @@ command[All]ByQueryType
 
 ---
 
-## logRoles
+## `logRoles`와 `screen.debug`
+
+#### **`logRoles`**
 
 -   DOM 트리의 모든 암시적 `aria-roles`의 리스트를 출력할 때 쓰는 헬퍼 함수.
 -   각 role에는 해당 ARIA role과 일치하는 모든 노드의 목록이 포함됨.
@@ -448,31 +451,37 @@ command[All]ByQueryType
 -   페이지가 길어서 역할이 있는 항목들이 헷갈릴 경우에 유용.
 -   [Debugging | Testing Library](https://testing-library.com/docs/dom-testing-library/api-debugging/#logroles)
 
-<details>
-<summary><i>Example</i></summary>
+    <details>
+    <summary><i>Example</i></summary>
 
-    // App.test.tsx
-    import { render, screen } from "@testing-library/react";
-    import App from "./App";
-    import { logRoles } from "@testing-library/dom";
+        // App.test.tsx
+        import { render, screen } from "@testing-library/react";
+        import App from "./App";
+        import { logRoles } from "@testing-library/dom";
 
-    test("getRoles", function () {
-        const { container } = render(<App />);
-        logRoles(container);
-    });
+        test("getRoles", function () {
+            const { container } = render(<App />);
+            logRoles(container);
+        });
 
-    // shell
-      console.log
-          button:
 
-          Name "Change to blue":
-          <button
-            style="background-color: red;"
-          />
+        // shell
+        console.log
+            button:
 
-          --------------------------------------------------
+            Name "Change to blue":
+            <button
+                style="background-color: red;"
+            />
 
-</details>
+            --------------------------------------------------
+
+    </details>
+
+#### `screen.debug()`
+
+-   특정 시점에 화면이 어떨지, 혹은 DOM이 어떻게 보일지 테스트 출력에 표시.
+-   무언가를 찾을 수 있거나 없을 때, 이유를 파악하는 데 용이.
 
 ---
 
@@ -544,6 +553,22 @@ command[All]ByQueryType
 
 -   [User Interactions | Testing Library](https://testing-library.com/docs/user-event/intro/)
 -   [Why you should test with user-event](https://ph-fritsche.github.io/blog/post/why-userevent)
+
+---
+
+## `jest.fn()`
+
+-   jest mock function.
+-   테스트에서 컴포넌트를 렌더링할 때, `props`를 전달해야 하는 경우 사용.
+-   Typescript, PropTypes 같은 정적 분석을 사용할 경우, 에러를 발생시키므로 필수 프로퍼티를 꼭 전달할 필요가 있음.
+-   이때, `jest.fn()`을 프로퍼티로 전달하면 통과.
+-   특별한 기능이 없고, 오류 방지를 위한 자리 표시자 역할.
+
+```tsx
+test("grand total updates properly if item is removed", async () => {
+    render(<OrderEntry setOrderPhase={jest.fn()} />);
+});
+```
 
 ---
 
