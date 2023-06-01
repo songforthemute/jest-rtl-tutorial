@@ -23,6 +23,7 @@ _<small>Learned this from the lecture of Bonnie Schulkin TY :D</small>_
 -   [Mock Service Worker](#mock-service-worker)
 -   [With Context](#with-context)
 -   [Error logs](#error-logs)
+-   [테스트 작성 시 고려할만한 것들](#테스트-작성-시-고려할만한-것들)
 
 ---
 
@@ -845,3 +846,5 @@ describe("Grand total", () => {
 -   쿼리 중 대기(await)해야 할 것이 있나?
 -   컴포넌트 내에 비동기 처리가 되고 있는 것이 있는가?
 -   찾는 요소가 동기화되어 나타나지 않는가?
+
+---
