@@ -970,9 +970,32 @@ $ npm install -D eslint-plugin-jest
 
 -   [Jest | nextjs.org](https://nextjs.org/docs/architecture/nextjs-compiler#jest)
 -   [ESLint | nextjs.org](https://nextjs.org/docs/app/building-your-application/configuring/eslint)
--   [NextRouter was not mounted | nextjs.org](https://nextjs.org/docs/messages/next-router-not-mounted)
 -   [밑바닥부터 Next.js 개발 환경 구축하기 - All in One | leo-xee.io](https://leo-xee.github.io/Next/next-setup-allinone/)
 -   [내가 주로 쓰는 Next.js ESLint 설정](https://www.univdev.page/posts/nextjs-eslint/)
 -   [Jest에서 window 객체 접근하기 | 데브머리큐](https://somedaycode.tistory.com/17)
+
+#### **Error Logs**
+
+-   NextRouter was not mounted.
+
+    -   [NextRouter was not mounted | nextjs.org](https://nextjs.org/docs/messages/next-router-not-mounted)
+
+    ```tsx
+    jest.mock("next/router", () => require("next-router-mock"));
+
+    it("Main title & Subtitle", async () => {
+        await mockRouter.push("/");
+        render(<Home />);
+        /* ... */
+    });
+    ```
+
+-   Error: Not implemented: window
+    ```tsx
+    describe("Check <Home>'s Components", () => {
+        window.scrollTo = jest.fn();
+        /* ... */
+    });
+    ```
 
 ---
