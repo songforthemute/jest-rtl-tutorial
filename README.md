@@ -24,6 +24,7 @@ _<small>Learned this from the lecture of Bonnie Schulkin TY :D</small>_
 -   [With Context](#with-context)
 -   [Error logs](#error-logs)
 -   [테스트 작성 시 고려할만한 것들](#테스트-작성-시-고려할만한-것들)
+-   [Jest in NextJS w/ TS](#jest-in-nextjs-w-ts)
 
 ---
 
@@ -846,5 +847,154 @@ describe("Grand total", () => {
 -   쿼리 중 대기(await)해야 할 것이 있나?
 -   컴포넌트 내에 비동기 처리가 되고 있는 것이 있는가?
 -   찾는 요소가 동기화되어 나타나지 않는가?
+
+---
+
+## Jest in NextJS w/ TS
+
+#### **Jest & Testing-library Packages**
+
+```shell
+$ npm install -D jest @testing-library/react @testing-library/jest-dom @testing-library/user-event
+
+# 테스트 환경은 node이므로, window 객체를 가져오기 위함
+$ npm i -D jest-environment-jsdom
+```
+
+#### **Jest setup configuration**
+
+-   `jest.config.js`
+
+    ```js
+    const nextJest = require("next/jest");
+
+    // Providing the path to your Next.js app which will enable loading next.config.js and .env files
+    const createJestConfig = nextJest({
+        dir: "./",
+    });
+
+    // Any custom config you want to pass to Jest
+    const customJestConfig = {
+        setupFilesAfterEnv: ["<rootDir>/jest.setup.js"], // 각각의 테스트 전에 실행할 모듈을 경로
+        moduleDirectories: ["node_modules", "<rootDir>/"],
+        testEnvironment: "jest-environment-jsdom",
+        moduleNameMapper: {
+            "^@/(.*)$": "<rootDir>/src/$1", // tsconfig에서 절대경로 사용 시에 jest가 인식하도록 경로 매핑
+        },
+    };
+
+    // createJestConfig is exported in this way to ensure that next/jest can load the Next.js configuration, which is async
+    module.exports = createJestConfig(customJestConfig);
+    ```
+
+-   `jest.setup.js`
+
+    ```js
+    // Optional: configure or set up a testing framework before each test.
+    // If you delete this file, remove `setupFilesAfterEnv` from `jest.config.js`
+
+    // Used for __tests__/testing-library.js
+    // Learn more: https://github.com/testing-library/jest-dom
+    import "@testing-library/jest-dom/extend-expect";
+    ```
+
+#### **ESLint & Prettier Packages**
+
+```shell
+# (선택) 익스텐션으로 대체 가능
+$ npm install -D eslint prettier
+
+# (선택) ESLint 대신, Prettier를 포매터로 사용
+$ npm install -D eslint-config-prettier eslint-plugin-prettier
+
+# Typescript ESLint 플러그인 & 파서
+$ npm install -D @typescript-eslint/eslint-plugin @typescript-eslint/parser
+
+# Nextjs.org 권장 ESLint 플러그인
+$ npm install -D eslint-plugin-react eslint-plugin-react-hooks eslint-plugin-next
+
+# airbnb ESLint 룰과 의존성 패키지
+$ npm install -D eslint-config-airbnb eslint-plugin-import eslint-plugin-jsx-a11y
+
+# airbnb ESLint 룰 - Typescript
+$ npm install -D eslint-config-airbnb-typescript
+
+# 테스팅을 위한 Jest ESLint 플러그인
+$ npm install -D eslint-plugin-jest
+```
+
+#### **ESLint & Prettier setup configuration**
+
+-   `.eslintrc.json`
+
+    ```json
+    {
+        "root": true,
+        "env": {
+            "browser": true,
+            "es6": true,
+            "node": true,
+            "jest": true
+        },
+        "parser": "@typescript-eslint/parser",
+        "parserOptions": {
+            "ecmaFeatures": {
+                "jsx": true
+            },
+            "ecmaVersion": "latest",
+            "sourceType": "module",
+            "project": "./tsconfig.json"
+        },
+        "ignorePatterns": ["jest.*.js"],
+        "extends": [
+            "airbnb",
+            "airbnb-typescript",
+            "airbnb/hooks",
+            "plugin:@typescript-eslint/recommended",
+            "plugin:@typescript-eslint/recommended-requiring-type-checking",
+            "plugin:@next/next/recommended",
+            "plugin:prettier/recommended",
+            "plugin:jest/recommended"
+        ],
+        "plugins": ["prettier", "@typescript-eslint", "jest", "import"],
+        "rules": {
+            "prettier/prettier": ["error", { "endOfLine": "auto" }],
+            "import/extensions": [
+                "error",
+                {
+                    "tsx": "never",
+                    "ts": "never",
+                    "js": "never",
+                    "jsx": "never"
+                }
+            ],
+            "react/react-in-jsx-scope": 0,
+            "react/jsx-props-no-spreading": 0
+        }
+    }
+    ```
+
+-   `.prettierrc.json`
+
+    ```json
+    {
+        "singleQuote": false,
+        "arrowParens": "always",
+        "semi": true,
+        "useTabs": false,
+        "tabWidth": 2,
+        "printWidth": 80,
+        "trailingComma": "all"
+    }
+    ```
+
+#### **References**
+
+-   [Jest | nextjs.org](https://nextjs.org/docs/architecture/nextjs-compiler#jest)
+-   [ESLint | nextjs.org](https://nextjs.org/docs/app/building-your-application/configuring/eslint)
+-   [NextRouter was not mounted | nextjs.org](https://nextjs.org/docs/messages/next-router-not-mounted)
+-   [밑바닥부터 Next.js 개발 환경 구축하기 - All in One | leo-xee.io](https://leo-xee.github.io/Next/next-setup-allinone/)
+-   [내가 주로 쓰는 Next.js ESLint 설정](https://www.univdev.page/posts/nextjs-eslint/)
+-   [Jest에서 window 객체 접근하기 | 데브머리큐](https://somedaycode.tistory.com/17)
 
 ---
