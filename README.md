@@ -966,20 +966,6 @@ $ npm install -D eslint-plugin-jest
 }
 ```
 
--   `.prettierrc.json` (선택)
-
-    ```json
-    {
-        "singleQuote": false,
-        "arrowParens": "always",
-        "semi": true,
-        "useTabs": false,
-        "tabWidth": 2,
-        "printWidth": 80,
-        "trailingComma": "all"
-    }
-    ```
-
 #### **References**
 
 -   [Jest | nextjs.org](https://nextjs.org/docs/architecture/nextjs-compiler#jest)
