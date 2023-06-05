@@ -991,11 +991,17 @@ $ npm install -D eslint-plugin-jest
     ```
 
 -   Error: Not implemented: window
+
     ```tsx
     describe("Check <Home>'s Components", () => {
         window.scrollTo = jest.fn();
         /* ... */
     });
     ```
+
+-   Failed to collect page data for /index.test.
+    -   빌드 에러 발생.
+    -   [How to exclude test files in next.js during build? | Stack Overflow](https://stackoverflow.com/questions/71305497/how-to-exclude-test-files-in-next-js-during-build)
+    -   `pages` 디렉터리에 테스트를 작성하지 않고, 프로젝트의 루트 디렉터리에 `__test__` 디렉터리를 생성해 테스트를 작성해야 함.
 
 ---
