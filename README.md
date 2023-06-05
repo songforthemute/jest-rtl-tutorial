@@ -902,10 +902,7 @@ $ npm i -D jest-environment-jsdom
 
 ```shell
 # (선택) 익스텐션으로 대체 가능
-$ npm install -D eslint prettier
-
-# (선택) ESLint 대신, Prettier를 포매터로 사용
-$ npm install -D eslint-config-prettier eslint-plugin-prettier
+$ npm install -D eslint
 
 # Typescript ESLint 플러그인 & 파서
 $ npm install -D @typescript-eslint/eslint-plugin @typescript-eslint/parser
@@ -913,11 +910,11 @@ $ npm install -D @typescript-eslint/eslint-plugin @typescript-eslint/parser
 # Nextjs.org 권장 ESLint 플러그인
 $ npm install -D eslint-plugin-react eslint-plugin-react-hooks eslint-plugin-next
 
-# airbnb ESLint 룰과 의존성 패키지
-$ npm install -D eslint-config-airbnb eslint-plugin-import eslint-plugin-jsx-a11y
+# import 린팅과 유효성 검사 플러그인
+$ npm install -D eslint-plugin-import
 
-# airbnb ESLint 룰 - Typescript
-$ npm install -D eslint-config-airbnb-typescript
+# React 컴포넌트의 접근성 검사 플러그인
+$ npm install -D eslint-plugin-jsx-a11y
 
 # 테스팅을 위한 Jest ESLint 플러그인
 $ npm install -D eslint-plugin-jest
@@ -927,54 +924,49 @@ $ npm install -D eslint-plugin-jest
 
 -   `.eslintrc.json`
 
-    ```json
-    {
-        "root": true,
-        "env": {
-            "browser": true,
-            "es6": true,
-            "node": true,
-            "jest": true
+```json
+{
+    "root": true,
+    "env": {
+        "browser": true,
+        "es6": true,
+        "node": true,
+        "jest": true
+    },
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
         },
-        "parser": "@typescript-eslint/parser",
-        "parserOptions": {
-            "ecmaFeatures": {
-                "jsx": true
-            },
-            "ecmaVersion": "latest",
-            "sourceType": "module",
-            "project": "./tsconfig.json"
-        },
-        "ignorePatterns": ["jest.*.js"],
-        "extends": [
-            "airbnb",
-            "airbnb-typescript",
-            "airbnb/hooks",
-            "plugin:@typescript-eslint/recommended",
-            "plugin:@typescript-eslint/recommended-requiring-type-checking",
-            "plugin:@next/next/recommended",
-            "plugin:prettier/recommended",
-            "plugin:jest/recommended"
+        "ecmaVersion": "latest",
+        "sourceType": "module",
+        "project": "./tsconfig.json"
+    },
+    "ignorePatterns": ["jest.*.js"],
+    "extends": [
+        "plugin:@next/next/recommended",
+        "plugin:jest/recommended",
+        "plugin:testing-library/react",
+        "plugin:jest-dom/recommended"
+    ],
+    "plugins": ["jest", "import", "testing-library", "jest-dom", "jsx-a11y"],
+    "rules": {
+        "import/extensions": [
+            "error",
+            {
+                "tsx": "never",
+                "ts": "never",
+                "js": "never",
+                "jsx": "never"
+            }
         ],
-        "plugins": ["prettier", "@typescript-eslint", "jest", "import"],
-        "rules": {
-            "prettier/prettier": ["error", { "endOfLine": "auto" }],
-            "import/extensions": [
-                "error",
-                {
-                    "tsx": "never",
-                    "ts": "never",
-                    "js": "never",
-                    "jsx": "never"
-                }
-            ],
-            "react/react-in-jsx-scope": 0,
-            "react/jsx-props-no-spreading": 0
-        }
+        "react/react-in-jsx-scope": 0,
+        "react/jsx-props-no-spreading": 0
     }
-    ```
+}
+```
 
--   `.prettierrc.json`
+-   `.prettierrc.json` (선택)
 
     ```json
     {
